@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, Input } from '@tarojs/components';
 import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
@@ -11,24 +11,38 @@ import styles from './index.module.scss';
 const CustomerPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('全部');
   const [searchText, setSearchText] = useState('');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const { customers, addCustomer } = useAppStore();
 
   useDidShow(() => {
     setActiveTab('全部');
     setSearchText('');
+    setRefreshKey(prev => prev + 1);
   });
 
   const tabs = ['全部', '待咨询', '咨询中', '待确认', '恢复中', '已完成'];
 
-  const todayReminders = customers.filter(c => c.status === '恢复中' || c.status === '待确认');
-  const newCustomers = customers.filter(c => c.level === '新客');
+  const todayReminders = useMemo(() => 
+    customers.filter(c => 
+      c.status === '恢复中' || c.status === '待确认' || c.status === '待咨询'
+    ),
+    [customers, refreshKey]
+  );
 
-  const filteredCustomers = customers.filter(customer => {
-    const matchTab = activeTab === '全部' || customer.status === activeTab;
-    const matchSearch = customer.name.includes(searchText) || customer.phone.includes(searchText);
-    return matchTab && matchSearch;
-  });
+  const newCustomers = useMemo(() => 
+    customers.filter(c => c.level === '新客'),
+    [customers, refreshKey]
+  );
+
+  const filteredCustomers = useMemo(() => 
+    customers.filter(customer => {
+      const matchTab = activeTab === '全部' || customer.status === activeTab;
+      const matchSearch = customer.name.includes(searchText) || customer.phone.includes(searchText);
+      return matchTab && matchSearch;
+    }),
+    [customers, activeTab, searchText, refreshKey]
+  );
 
   const handleImport = () => {
     Taro.showActionSheet({
@@ -170,21 +184,10 @@ const CustomerPage: React.FC = () => {
 
         {todayReminders.length > 0 && (
           <View className={styles.section}>
-            <SectionTitle title="今日跟进" subTitle="优先处理以下客户" />
-            <View className={styles.reminderCard} onClick={() => {
-              Taro.navigateTo({ url: `/pages/customer-detail/index?id=${todayReminders[0].id}` });
-            }}>
-              <Text className={styles.reminderIcon}>⏰</Text>
-              <View className={styles.reminderContent}>
-                <Text className={styles.reminderTitle}>
-                  {todayReminders[0].name} · {todayReminders[0].status}
-                </Text>
-                <Text className={styles.reminderDesc}>
-                  {todayReminders[0].tags.slice(0, 3).join(' · ')}
-                </Text>
-              </View>
-              <Text className={styles.reminderDesc}>查看 →</Text>
-            </View>
+            <SectionTitle title="今日跟进" subTitle={`共 ${todayReminders.length} 位需要跟进`} />
+            {todayReminders.map((customer) => (
+              <CustomerCard key={customer.id} customer={customer} />
+            ))}
           </View>
         )}
 

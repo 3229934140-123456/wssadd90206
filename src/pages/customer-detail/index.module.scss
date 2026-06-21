@@ -231,3 +231,108 @@
   color: $color-text-secondary;
   line-height: $line-height-normal;
 }
+
+.demandRecordCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.demandMarkedRow {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+}
+
+.demandMiniFace {
+  width: 120rpx;
+  height: 140rpx;
+  flex-shrink: 0;
+}
+
+.demandMarkedInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.markedLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+}
+
+.markedTagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.markedTag {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  border: 1rpx solid;
+}
+
+.demandDetailRow {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.demandDetailLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  width: 120rpx;
+  flex-shrink: 0;
+  margin-right: $spacing-sm;
+  padding-top: 6rpx;
+}
+
+.demandTagWrap {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.demandConcernTag {
+  padding: 4rpx 12rpx;
+  background: $color-primary-bg;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  color: $color-primary;
+}
+
+.demandWorryTag {
+  padding: 4rpx 12rpx;
+  background: $color-tag-orange;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  color: $color-warning;
+}
+
+.emptyTag {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.demandBudget {
+  flex: 1;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-secondary;
+}

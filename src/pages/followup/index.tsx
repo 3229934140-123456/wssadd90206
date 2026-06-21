@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
 import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
@@ -10,7 +10,7 @@ import styles from './index.module.scss';
 
 const FollowupPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('全部');
-  const [, setRefreshKey] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const tabs = ['全部', '待回访', '进行中', '已完成'];
 
   const { customers, followupRecords } = useAppStore();
@@ -19,14 +19,28 @@ const FollowupPage: React.FC = () => {
     setRefreshKey(prev => prev + 1);
   });
 
-  const pendingFollowups = followupRecords.filter(f => f.status === '待回访');
-  const needReview = followupRecords.filter(f => f.needDoctorReview);
-  const completedFollowups = followupRecords.filter(f => f.status === '已完成');
+  const pendingFollowups = useMemo(() => 
+    followupRecords.filter(f => f.status === '待回访'),
+    [followupRecords, refreshKey]
+  );
 
-  const filteredRecords = followupRecords.filter(record => {
-    if (activeTab === '全部') return true;
-    return record.status === activeTab;
-  });
+  const needReview = useMemo(() => 
+    followupRecords.filter(f => f.needDoctorReview),
+    [followupRecords, refreshKey]
+  );
+
+  const completedFollowups = useMemo(() => 
+    followupRecords.filter(f => f.status === '已完成'),
+    [followupRecords, refreshKey]
+  );
+
+  const filteredRecords = useMemo(() => 
+    followupRecords.filter(record => {
+      if (activeTab === '全部') return true;
+      return record.status === activeTab;
+    }),
+    [followupRecords, activeTab, refreshKey]
+  );
 
   const handleFollowupClick = (recordId: string) => {
     Taro.navigateTo({

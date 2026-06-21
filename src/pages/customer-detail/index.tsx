@@ -4,6 +4,7 @@ import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import { useAppStore } from '@/store';
 import SectionTitle from '@/components/SectionTitle';
+import FaceMap from '@/components/FaceMap';
 import styles from './index.module.scss';
 
 const CustomerDetailPage: React.FC = () => {
@@ -170,26 +171,59 @@ const CustomerDetailPage: React.FC = () => {
         {customerDemandRecords.length > 0 && (
           <View className={styles.section}>
             <SectionTitle title="诉求记录" extra="查看全部" />
-            <View className={styles.card}>
-              {customerDemandRecords.map(record => (
-                <View
-                  key={record.id}
-                  className={styles.recordItem}
-                  onClick={() => Taro.navigateTo({ url: `/pages/demand-detail/index?id=${record.id}` })}
-                >
-                  <View className={styles.recordHeader}>
-                    <Text className={styles.recordTitle}>{record.date} 诉求记录</Text>
-                    <Text className={styles.recordDate}>{record.consultant}</Text>
-                  </View>
-                  <Text className={styles.recordDesc}>
-                    改善部位：{record.concernTags.join('、')}
-                  </Text>
-                  <Text className={styles.recordDesc}>
-                    预算：{record.budgetRange}
-                  </Text>
+            {customerDemandRecords.map(record => (
+              <View
+                key={record.id}
+                className={styles.demandRecordCard}
+                onClick={() => Taro.navigateTo({ url: `/pages/demand-detail/index?id=${record.id}` })}
+              >
+                <View className={styles.recordHeader}>
+                  <Text className={styles.recordTitle}>{record.date} 诉求记录</Text>
+                  <Text className={styles.recordDate}>{record.consultant}</Text>
                 </View>
-              ))}
-            </View>
+
+                {record.markedAreas && record.markedAreas.length > 0 && (
+                  <View className={styles.demandMarkedRow}>
+                    <View className={styles.demandMiniFace}>
+                      <FaceMap markedAreas={record.markedAreas} />
+                    </View>
+                    <View className={styles.demandMarkedInfo}>
+                      <Text className={styles.markedLabel}>圈选部位</Text>
+                      <View className={styles.markedTagList}>
+                        {record.markedAreas.slice(0, 5).map((area) => (
+                          <View key={area.id} className={styles.markedTag} style={{ backgroundColor: area.color + '20', borderColor: area.color }}>
+                            <Text style={{ color: area.color }}>{area.label}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                )}
+
+                <View className={styles.demandDetailRow}>
+                  <Text className={styles.demandDetailLabel}>改善部位</Text>
+                  <View className={styles.demandTagWrap}>
+                    {record.concernTags.length > 0 ? record.concernTags.map((tag, i) => (
+                      <Text key={i} className={styles.demandConcernTag}>{tag}</Text>
+                    )) : <Text className={styles.emptyTag}>未记录</Text>}
+                  </View>
+                </View>
+
+                <View className={styles.demandDetailRow}>
+                  <Text className={styles.demandDetailLabel}>客户顾虑</Text>
+                  <View className={styles.demandTagWrap}>
+                    {record.worryTags.length > 0 ? record.worryTags.map((tag, i) => (
+                      <Text key={i} className={styles.demandWorryTag}>{tag}</Text>
+                    )) : <Text className={styles.emptyTag}>未记录</Text>}
+                  </View>
+                </View>
+
+                <View className={styles.demandDetailRow}>
+                  <Text className={styles.demandDetailLabel}>预算范围</Text>
+                  <Text className={styles.demandBudget}>{record.budgetRange || '未设置'}</Text>
+                </View>
+              </View>
+            ))}
           </View>
         )}
 

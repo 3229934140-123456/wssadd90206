@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
 import Taro, { useDidShow } from '@tarojs/taro';
 import { concernTags, worryTags } from '@/data/mockData';
 import { useAppStore } from '@/store';
 import SectionTitle from '@/components/SectionTitle';
 import StatCard from '@/components/StatCard';
+import FaceMap from '@/components/FaceMap';
 import styles from './index.module.scss';
 
 const DemandPage: React.FC = () => {
   const { customers, demandRecords } = useAppStore();
-  const [, setRefreshKey] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useDidShow(() => {
     setRefreshKey(prev => prev + 1);
   });
+
+  const recentRecords = useMemo(() => 
+    demandRecords.slice(0, 5),
+    [demandRecords, refreshKey]
+  );
 
   const topConcerns = concernTags.slice(0, 6).map(tag => ({
     ...tag,
@@ -122,16 +128,16 @@ const DemandPage: React.FC = () => {
         <View className={styles.section}>
           <SectionTitle title="最近记录" extra="查看全部" />
           
-          {demandRecords.length > 0 ? (
-            <View className={styles.card}>
-              {demandRecords.map((record) => {
-                const customer = customers.find(c => c.id === record.customerId);
-                return (
-                  <View
-                    key={record.id}
-                    className={styles.demandItem}
-                    onClick={() => handleDemandClick(record.id)}
-                  >
+          {recentRecords.length > 0 ? (
+            recentRecords.map((record) => {
+              const customer = customers.find(c => c.id === record.customerId);
+              return (
+                <View
+                  key={record.id}
+                  className={styles.demandCard}
+                  onClick={() => handleDemandClick(record.id)}
+                >
+                  <View className={styles.demandCardHeader}>
                     <Image
                       className={styles.demandAvatar}
                       src={customer?.avatar || 'https://picsum.photos/id/64/200/200'}
@@ -140,20 +146,58 @@ const DemandPage: React.FC = () => {
                     <View className={styles.demandInfo}>
                       <Text className={styles.demandName}>{record.customerName}</Text>
                       <Text className={styles.demandDate}>{record.date} · {record.consultant}</Text>
+                    </View>
+                  </View>
+
+                  {record.markedAreas && record.markedAreas.length > 0 && (
+                    <View className={styles.markedAreasRow}>
+                      <View className={styles.miniFaceMap}>
+                        <FaceMap markedAreas={record.markedAreas} />
+                      </View>
+                      <View className={styles.markedAreasList}>
+                        <Text className={styles.markedAreasLabel}>圈选部位：</Text>
+                        <View className={styles.markedTags}>
+                          {record.markedAreas.slice(0, 5).map((area, i) => (
+                            <View key={area.id} className={styles.markedTag} style={{ backgroundColor: area.color + '20', borderColor: area.color }}>
+                              <Text style={{ color: area.color }}>{area.label}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    </View>
+                  )}
+
+                  <View className={styles.demandMetaRow}>
+                    <View className={styles.demandMetaItem}>
+                      <Text className={styles.metaLabel}>改善部位</Text>
                       <View className={styles.demandTags}>
                         {record.concernTags.slice(0, 3).map((tag, i) => (
                           <Text key={i} className={styles.miniTag}>{tag}</Text>
                         ))}
-                        {record.worryTags.slice(0, 2).map((tag, i) => (
-                          <Text key={`w${i}`} className={`${styles.miniTag} ${styles.worryTag}`}>{tag}</Text>
-                        ))}
+                        {record.concernTags.length === 0 && <Text className={styles.metaEmpty}>未记录</Text>}
                       </View>
                     </View>
-                    <Text className={styles.demandArrow}>›</Text>
                   </View>
-                );
-              })}
-            </View>
+
+                  <View className={styles.demandMetaRow}>
+                    <View className={styles.demandMetaItem}>
+                      <Text className={styles.metaLabel}>客户顾虑</Text>
+                      <View className={styles.demandTags}>
+                        {record.worryTags.slice(0, 3).map((tag, i) => (
+                          <Text key={`w${i}`} className={`${styles.miniTag} ${styles.worryTag}`}>{tag}</Text>
+                        ))}
+                        {record.worryTags.length === 0 && <Text className={styles.metaEmpty}>未记录</Text>}
+                      </View>
+                    </View>
+                  </View>
+
+                  <View className={styles.demandMetaRow}>
+                    <Text className={styles.metaLabel}>预算范围</Text>
+                    <Text className={styles.budgetValue}>{record.budgetRange || '未设置'}</Text>
+                  </View>
+                </View>
+              );
+            })
           ) : (
             <View className={styles.emptyState}>
               <Text className={styles.emptyIcon}>📝</Text>

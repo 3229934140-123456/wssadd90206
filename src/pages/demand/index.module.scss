@@ -130,6 +130,98 @@
   margin-left: $spacing-sm;
 }
 
+.demandCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.demandCardHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.markedAreasRow {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+}
+
+.miniFaceMap {
+  width: 120rpx;
+  height: 140rpx;
+  flex-shrink: 0;
+}
+
+.markedAreasList {
+  flex: 1;
+  min-width: 0;
+}
+
+.markedAreasLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+}
+
+.markedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.markedTag {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  border: 1rpx solid;
+}
+
+.demandMetaRow {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.demandMetaItem {
+  flex: 1;
+}
+
+.metaLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  width: 120rpx;
+  flex-shrink: 0;
+  margin-right: $spacing-sm;
+  padding-top: 6rpx;
+}
+
+.metaEmpty {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.budgetValue {
+  flex: 1;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-secondary;
+}
+
 .quickEntry {
   background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
   border-radius: $radius-lg;

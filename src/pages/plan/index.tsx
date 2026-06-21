@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
 import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
@@ -9,7 +9,7 @@ import styles from './index.module.scss';
 
 const PlanPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('全部');
-  const [, setRefreshKey] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const tabs = ['全部', '待确认', '已确认'];
 
   const { customers, treatmentPlans } = useAppStore();
@@ -18,13 +18,23 @@ const PlanPage: React.FC = () => {
     setRefreshKey(prev => prev + 1);
   });
 
-  const pendingPlans = treatmentPlans.filter(p => p.status === '待确认');
-  const confirmedPlans = treatmentPlans.filter(p => p.status === '已确认');
+  const pendingPlans = useMemo(() => 
+    treatmentPlans.filter(p => p.status === '待确认'),
+    [treatmentPlans, refreshKey]
+  );
 
-  const filteredPlans = treatmentPlans.filter(plan => {
-    if (activeTab === '全部') return true;
-    return plan.status === activeTab;
-  });
+  const confirmedPlans = useMemo(() => 
+    treatmentPlans.filter(p => p.status === '已确认'),
+    [treatmentPlans, refreshKey]
+  );
+
+  const filteredPlans = useMemo(() => 
+    treatmentPlans.filter(plan => {
+      if (activeTab === '全部') return true;
+      return plan.status === activeTab;
+    }),
+    [treatmentPlans, activeTab, refreshKey]
+  );
 
   const handlePlanClick = (planId: string) => {
     Taro.navigateTo({
@@ -198,6 +208,11 @@ const PlanPage: React.FC = () => {
                       <Text className={styles.planMeta}>
                         {plan.date} · {plan.totalDosage}
                       </Text>
+                      {plan.status === '已确认' && plan.confirmedAt && (
+                        <Text className={styles.confirmedTime}>
+                          ✅ 确认于 {plan.confirmedAt}
+                        </Text>
+                      )}
                     </View>
                     <View className={classnames(styles.planStatus, getStatusClass(plan.status))}>
                       <Text>{plan.status}</Text>
