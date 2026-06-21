@@ -150,19 +150,18 @@ export const useAppStore = create<AppState>()(
       },
 
       updateFollowupRecord: (id, updates) => {
-        set((state) => ({
-          followupRecords: state.followupRecords.map((r) =>
-            r.id === id ? { ...r, ...updates } : r
-          )
-        }));
-
-        const record = get().followupRecords.find(r => r.id === id);
-        if (record && record.discomfortTags.length > 0) {
-          get().updateFollowupRecord(id, {
-            hasDiscomfort: true,
-            needDoctorReview: true
+        set((state) => {
+          const newRecords = state.followupRecords.map((r) => {
+            if (r.id !== id) return r;
+            const merged = { ...r, ...updates };
+            if (merged.discomfortTags && merged.discomfortTags.length > 0) {
+              merged.hasDiscomfort = true;
+              merged.needDoctorReview = true;
+            }
+            return merged;
           });
-        }
+          return { followupRecords: newRecords };
+        });
       },
 
       addPhotoToFollowup: (id, photoUrl) => {

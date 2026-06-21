@@ -13,13 +13,14 @@ import styles from './index.module.scss';
 const DemandDetailPage: React.FC = () => {
   const router = useRouter();
   const recordId = router.params.id;
-  const customerId = router.params.customerId || 'c001';
+  const customerId = router.params.customerId;
   const isNew = !recordId;
 
   const { customers, demandRecords, addDemandRecord, updateDemandRecord } = useAppStore();
 
   const existingRecord = demandRecords.find(d => d.id === recordId);
-  const customer = customers.find(c => c.id === customerId) || customers[0];
+  const actualCustomerId = customerId || existingRecord?.customerId || customers[0]?.id;
+  const customer = customers.find(c => c.id === actualCustomerId) || customers[0];
 
   const [selectedConcerns, setSelectedConcerns] = useState<string[]>(
     existingRecord?.concernTags || []
@@ -152,13 +153,13 @@ const DemandDetailPage: React.FC = () => {
         </View>
 
         <View className={styles.section}>
-          <SectionTitle title="面部示意图" subTitle={isNew ? '点击图上位置添加标注' : '客户关注区域'} />
+          <SectionTitle title="面部示意图" subTitle="点击图上位置添加标注，点击标注可删除" />
           <View className={styles.card}>
             <View className={styles.faceMapContainer}>
               <FaceMap
                 markedAreas={markedAreas}
                 showLabels={true}
-                interactive={isNew}
+                interactive={true}
                 currentColor={selectedColor}
                 onAddMark={handleAddMark}
                 onRemoveMark={handleRemoveMark}
@@ -180,11 +181,9 @@ const DemandDetailPage: React.FC = () => {
               ))}
             </View>
             
-            {isNew && (
-              <Text className={styles.tipText}>
-                💡 提示：先选择颜色和改善部位，再点击面部示意图添加标注
-              </Text>
-            )}
+            <Text className={styles.tipText}>
+              💡 提示：先选择颜色和改善部位，再点击面部示意图添加标注
+            </Text>
           </View>
         </View>
 

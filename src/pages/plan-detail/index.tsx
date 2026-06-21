@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, Image } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
@@ -25,13 +25,20 @@ const PlanDetailPage: React.FC = () => {
     [customers, customerId, plan]
   );
 
-  const [checkedContra, setCheckedContra] = useState<string[]>(plan.contraindications);
+  const [checkedContra, setCheckedContra] = useState<string[]>(plan.contraindications || []);
+
+  useEffect(() => {
+    if (plan.contraindications) {
+      setCheckedContra(plan.contraindications);
+    }
+  }, [plan.id, plan.contraindications]);
 
   const toggleContra = (label: string) => {
-    setCheckedContra(prev =>
-      prev.includes(label) ? prev.filter(c => c !== label) : [...prev, label]
-    );
-    updateTreatmentPlan(plan.id, { contraindications: checkedContra });
+    setCheckedContra(prev => {
+      const next = prev.includes(label) ? prev.filter(c => c !== label) : [...prev, label];
+      updateTreatmentPlan(plan.id, { contraindications: next });
+      return next;
+    });
   };
 
   const handleConfirm = () => {
