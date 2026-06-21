@@ -1,0 +1,301 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, #52C41A 0%, #73D13D 100%);
+  padding: $spacing-xl $page-padding $spacing-lg;
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.pageTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: #fff;
+  margin-bottom: $spacing-xs;
+}
+
+.pageDesc {
+  font-size: $font-size-md;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.content {
+  padding: 0 $page-padding;
+  margin-top: -20rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.section {
+  margin-bottom: $spacing-lg;
+}
+
+.followupCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.cardAvatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.cardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 6rpx;
+}
+
+.cardStage {
+  display: flex;
+  align-items: center;
+}
+
+.stageBadge {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  margin-right: $spacing-xs;
+}
+
+.stageDay1 {
+  background: $color-tag-blue;
+  color: $color-info;
+}
+
+.stageDay7 {
+  background: $color-tag-purple;
+  color: $color-secondary;
+}
+
+.stageDay14 {
+  background: $color-tag-green;
+  color: $color-success;
+}
+
+.stageText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.cardStatus {
+  padding: 8rpx 20rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.statusTodo {
+  background: $color-tag-orange;
+  color: $color-warning;
+}
+
+.statusDoing {
+  background: $color-tag-blue;
+  color: $color-info;
+}
+
+.statusDone {
+  background: $color-tag-green;
+  color: $color-success;
+}
+
+.cardBody {
+  margin-bottom: $spacing-md;
+}
+
+.photoRow {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.photoItem {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-md;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.photoImg {
+  width: 100%;
+  height: 100%;
+}
+
+.photoEmpty {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-md;
+  background: $color-bg-page;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx dashed $color-border;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.feedbackPreview {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(2);
+}
+
+.discomfortTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: $spacing-sm;
+}
+
+.discomfortTag {
+  padding: 4rpx 12rpx;
+  background: $color-tag-pink;
+  color: $color-error;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+}
+
+.rebookTag {
+  padding: 4rpx 12rpx;
+  background: $color-tag-green;
+  color: $color-success;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  margin-left: auto;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.footerInfo {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.warningBadge {
+  padding: 4rpx 12rpx;
+  background: $color-tag-pink;
+  color: $color-error;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.viewDetail {
+  font-size: $font-size-sm;
+  color: $color-success;
+}
+
+.scriptCard {
+  background: linear-gradient(135deg, #F6FFED 0%, #D9F7BE 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.scriptTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: #389E0D;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+}
+
+.scriptIcon {
+  margin-right: $spacing-xs;
+}
+
+.scriptContent {
+  font-size: $font-size-sm;
+  color: #52C41A;
+  line-height: $line-height-loose;
+  background: rgba(255, 255, 255, 0.6);
+  padding: $spacing-md;
+  border-radius: $radius-md;
+}
+
+.tabRow {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  overflow-x: auto;
+}
+
+.tabItem {
+  flex-shrink: 0;
+  padding: 12rpx 28rpx;
+  border-radius: $radius-button;
+  background: $color-bg-card;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  transition: all $transition-fast;
+
+  &.active {
+    background: $color-success;
+    color: #fff;
+  }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-xl * 2;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

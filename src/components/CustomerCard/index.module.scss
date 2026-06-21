@@ -1,0 +1,153 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.99);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-round;
+  background: $color-primary-bg;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-xs;
+}
+
+.name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.level {
+  padding: 2rpx 12rpx;
+  border-radius: $radius-xs;
+  
+  .levelText {
+    font-size: $font-size-xs;
+  }
+}
+
+.levelVip {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  .levelText { color: #fff; }
+}
+
+.levelNormal {
+  background: $color-tag-blue;
+  .levelText { color: $color-info; }
+}
+
+.levelNew {
+  background: $color-tag-green;
+  .levelText { color: $color-success; }
+}
+
+.status {
+  padding: 2rpx 12rpx;
+  border-radius: $radius-xs;
+  
+  .statusText {
+    font-size: $font-size-xs;
+  }
+}
+
+.statusPending {
+  background: $color-tag-orange;
+  .statusText { color: $color-warning; }
+}
+
+.statusConsulting {
+  background: $color-tag-blue;
+  .statusText { color: $color-info; }
+}
+
+.statusConfirm {
+  background: $color-tag-purple;
+  .statusText { color: $color-secondary; }
+}
+
+.statusTreating {
+  background: $color-tag-pink;
+  .statusText { color: $color-primary; }
+}
+
+.statusRecovering {
+  background: $color-tag-green;
+  .statusText { color: $color-success; }
+}
+
+.statusDone {
+  background: $color-bg-hover;
+  .statusText { color: $color-text-secondary; }
+}
+
+.phone {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.tag {
+  background: $color-primary-bg;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+}
+
+.tagText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.footerText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.nextVisit {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}

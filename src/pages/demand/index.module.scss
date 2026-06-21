@@ -1,0 +1,260 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, #A78BFA 0%, #C4B5FD 100%);
+  padding: $spacing-xl $page-padding $spacing-lg;
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.pageTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: #fff;
+  margin-bottom: $spacing-xs;
+}
+
+.pageDesc {
+  font-size: $font-size-md;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.content {
+  padding: 0 $page-padding;
+  margin-top: -20rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.section {
+  margin-bottom: $spacing-lg;
+}
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.cardTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.cardMore {
+  font-size: $font-size-sm;
+  color: $color-secondary;
+}
+
+.demandItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.demandAvatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.demandInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.demandName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 6rpx;
+}
+
+.demandDate {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: 8rpx;
+}
+
+.demandTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.miniTag {
+  padding: 4rpx 12rpx;
+  background: $color-primary-bg;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  color: $color-primary;
+}
+
+.worryTag {
+  background: $color-tag-orange;
+  color: $color-warning;
+}
+
+.demandArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  margin-left: $spacing-sm;
+}
+
+.quickEntry {
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  align-items: center;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.quickIcon {
+  width: 80rpx;
+  height: 80rpx;
+  background: #fff;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-right: $spacing-md;
+  box-shadow: 0 4rpx 12rpx rgba(167, 139, 250, 0.2);
+}
+
+.quickContent {
+  flex: 1;
+}
+
+.quickTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-secondary;
+  margin-bottom: 4rpx;
+}
+
+.quickDesc {
+  font-size: $font-size-sm;
+  color: #8B5CF6;
+}
+
+.quickArrow {
+  font-size: $font-size-xl;
+  color: $color-secondary;
+}
+
+.tagCloudSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.tagCloudTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+}
+
+.tagIcon {
+  margin-right: $spacing-xs;
+}
+
+.popularTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.popularTag {
+  padding: 12rpx 24rpx;
+  background: $color-primary-bg;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.tagPurple {
+  background: $color-tag-purple;
+  color: $color-secondary;
+}
+
+.tagOrange {
+  background: $color-tag-orange;
+  color: $color-warning;
+}
+
+.tagBlue {
+  background: $color-tag-blue;
+  color: $color-info;
+}
+
+.tagCount {
+  margin-left: 6rpx;
+  opacity: 0.7;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-xl * 2;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.emptyBtn {
+  padding: 16rpx 32rpx;
+  background: $color-secondary;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: #fff;
+}

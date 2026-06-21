@@ -1,0 +1,74 @@
+@use '@/styles/variables.scss' as *;
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.tagItem {
+  padding: 16rpx 28rpx;
+  border-radius: $radius-button;
+  background: $color-bg-card;
+  border: 2rpx solid $color-border;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.tagText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+}
+
+.selected {
+  border-color: $color-primary;
+  background: $color-primary-bg;
+
+  .tagText {
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.colorPink {
+  &.selected {
+    border-color: $color-primary;
+    background: $color-tag-pink;
+    .tagText { color: $color-primary; }
+  }
+}
+
+.colorPurple {
+  &.selected {
+    border-color: $color-secondary;
+    background: $color-tag-purple;
+    .tagText { color: $color-secondary; }
+  }
+}
+
+.colorBlue {
+  &.selected {
+    border-color: $color-info;
+    background: $color-tag-blue;
+    .tagText { color: $color-info; }
+  }
+}
+
+.colorGreen {
+  &.selected {
+    border-color: $color-success;
+    background: $color-tag-green;
+    .tagText { color: $color-success; }
+  }
+}
+
+.colorOrange {
+  &.selected {
+    border-color: $color-warning;
+    background: $color-tag-orange;
+    .tagText { color: $color-warning; }
+  }
+}

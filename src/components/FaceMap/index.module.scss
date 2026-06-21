@@ -1,0 +1,210 @@
+@use '@/styles/variables.scss' as *;
+
+.faceMapContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-md;
+  background: linear-gradient(180deg, #FFF8FA 0%, #FFEEF3 100%);
+  border-radius: $radius-lg;
+}
+
+.faceOutline {
+  position: relative;
+  width: 400rpx;
+  height: 500rpx;
+}
+
+.faceShape {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 340rpx;
+  height: 460rpx;
+  background: linear-gradient(180deg, #FFE4EC 0%, #FFD1DC 100%);
+  border-radius: 50% 50% 45% 45%;
+  box-shadow: inset 0 -20rpx 40rpx rgba(255, 107, 157, 0.15);
+}
+
+.forehead {
+  position: absolute;
+  top: 30rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240rpx;
+  height: 60rpx;
+  border-bottom: 2rpx dashed rgba(255, 107, 157, 0.3);
+}
+
+.eyebrowLeft {
+  position: absolute;
+  top: 110rpx;
+  left: 70rpx;
+  width: 70rpx;
+  height: 12rpx;
+  background: #C9A2A8;
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+.eyebrowRight {
+  position: absolute;
+  top: 110rpx;
+  right: 70rpx;
+  width: 70rpx;
+  height: 12rpx;
+  background: #C9A2A8;
+  border-radius: 50%;
+  transform: rotate(8deg);
+}
+
+.eyeLeft {
+  position: absolute;
+  top: 140rpx;
+  left: 80rpx;
+  width: 50rpx;
+  height: 30rpx;
+  background: #FFF;
+  border-radius: 50%;
+  box-shadow: inset 0 2rpx 8rpx rgba(0,0,0,0.1);
+}
+
+.eyeRight {
+  position: absolute;
+  top: 140rpx;
+  right: 80rpx;
+  width: 50rpx;
+  height: 30rpx;
+  background: #FFF;
+  border-radius: 50%;
+  box-shadow: inset 0 2rpx 8rpx rgba(0,0,0,0.1);
+}
+
+.nose {
+  position: absolute;
+  top: 190rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 80rpx;
+  background: linear-gradient(180deg, rgba(255, 182, 200, 0.5) 0%, rgba(255, 107, 157, 0.3) 100%);
+  border-radius: 0 0 50% 50%;
+}
+
+.cheekLeft {
+  position: absolute;
+  top: 240rpx;
+  left: 40rpx;
+  width: 80rpx;
+  height: 60rpx;
+  background: rgba(255, 150, 180, 0.3);
+  border-radius: 50%;
+  filter: blur(8rpx);
+}
+
+.cheekRight {
+  position: absolute;
+  top: 240rpx;
+  right: 40rpx;
+  width: 80rpx;
+  height: 60rpx;
+  background: rgba(255, 150, 180, 0.3);
+  border-radius: 50%;
+  filter: blur(8rpx);
+}
+
+.lipUpper {
+  position: absolute;
+  top: 330rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80rpx;
+  height: 25rpx;
+  background: #FF8FA3;
+  border-radius: 50% 50% 30% 30%;
+}
+
+.lipLower {
+  position: absolute;
+  top: 352rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100rpx;
+  height: 35rpx;
+  background: #FF7B9C;
+  border-radius: 30% 30% 50% 50%;
+}
+
+.chin {
+  position: absolute;
+  bottom: 30rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120rpx;
+  height: 60rpx;
+  border-top: 2rpx dashed rgba(255, 107, 157, 0.3);
+}
+
+.markedCircle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border: 4rpx solid;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.areaLabel {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.injectionPoint {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pointDot {
+  width: 20rpx;
+  height: 20rpx;
+  background: $color-secondary;
+  border: 4rpx solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.2);
+}
+
+.pointLabel {
+  font-size: 20rpx;
+  color: $color-secondary;
+  margin-top: 4rpx;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.8);
+  padding: 2rpx 8rpx;
+  border-radius: $radius-xs;
+}
+
+.faceLabels {
+  margin-top: $spacing-md;
+}
+
+.labelText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

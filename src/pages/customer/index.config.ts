@@ -1,0 +1,4 @@
+export default definePageConfig({
+  navigationBarTitleText: '客户跟进',
+  enablePullDownRefresh: true
+})
