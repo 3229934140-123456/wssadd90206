@@ -13,6 +13,19 @@
   position: relative;
   width: 400rpx;
   height: 500rpx;
+  cursor: crosshair;
+}
+
+.faceOutlineInteractive {
+  position: relative;
+  width: 400rpx;
+  height: 500rpx;
+  cursor: crosshair;
+  user-select: none;
+
+  &:active {
+    opacity: 0.95;
+  }
 }
 
 .faceShape {

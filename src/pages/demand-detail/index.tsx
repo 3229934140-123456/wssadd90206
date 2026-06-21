@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, Image, Textarea } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
-import { mockCustomers, mockDemandRecords, concernTags, worryTags, budgetRanges } from '@/data/mockData';
+import { concernTags, worryTags, budgetRanges } from '@/data/mockData';
+import { useAppStore } from '@/store';
+import { MarkedArea } from '@/types';
 import TagSelector from '@/components/TagSelector';
 import FaceMap from '@/components/FaceMap';
 import SectionTitle from '@/components/SectionTitle';
@@ -12,9 +14,12 @@ const DemandDetailPage: React.FC = () => {
   const router = useRouter();
   const recordId = router.params.id;
   const customerId = router.params.customerId || 'c001';
+  const isNew = !recordId;
 
-  const existingRecord = mockDemandRecords.find(d => d.id === recordId);
-  const customer = mockCustomers.find(c => c.id === customerId) || mockCustomers[0];
+  const { customers, demandRecords, addDemandRecord, updateDemandRecord } = useAppStore();
+
+  const existingRecord = demandRecords.find(d => d.id === recordId);
+  const customer = customers.find(c => c.id === customerId) || customers[0];
 
   const [selectedConcerns, setSelectedConcerns] = useState<string[]>(
     existingRecord?.concernTags || []
@@ -27,8 +32,39 @@ const DemandDetailPage: React.FC = () => {
   );
   const [notes, setNotes] = useState<string>(existingRecord?.notes || '');
   const [selectedColor, setSelectedColor] = useState<string>('#FF4D4F');
+  const [markedAreas, setMarkedAreas] = useState<MarkedArea[]>(
+    existingRecord?.markedAreas || []
+  );
 
   const colors = ['#FF4D4F', '#1890FF', '#52C41A', '#FAAD14', '#722ED1'];
+
+  const getAreaLabel = (): string => {
+    if (selectedConcerns.length > 0) {
+      return selectedConcerns[selectedConcerns.length - 1];
+    }
+    return '关注区域';
+  };
+
+  const handleAddMark = (x: number, y: number) => {
+    const label = getAreaLabel();
+    const newArea: MarkedArea = {
+      id: `m${Date.now()}`,
+      x,
+      y,
+      radius: 10,
+      color: selectedColor,
+      label
+    };
+    setMarkedAreas(prev => [...prev, newArea]);
+    
+    if (!selectedConcerns.includes(label) && label !== '关注区域') {
+      setSelectedConcerns(prev => [...prev, label]);
+    }
+  };
+
+  const handleRemoveMark = (id: string) => {
+    setMarkedAreas(prev => prev.filter(a => a.id !== id));
+  };
 
   const handleConcernToggle = (tag: string) => {
     setSelectedConcerns(prev =>
@@ -42,7 +78,37 @@ const DemandDetailPage: React.FC = () => {
     );
   };
 
+  const validateForm = (): boolean => {
+    if (selectedConcerns.length === 0) {
+      Taro.showToast({ title: '请选择改善部位', icon: 'none' });
+      return false;
+    }
+    if (!selectedBudget) {
+      Taro.showToast({ title: '请选择预算范围', icon: 'none' });
+      return false;
+    }
+    return true;
+  };
+
   const handleSave = () => {
+    if (!validateForm()) return;
+
+    const recordData = {
+      customerId: customer.id,
+      customerName: customer.name,
+      concernTags: selectedConcerns,
+      worryTags: selectedWorries,
+      budgetRange: selectedBudget,
+      markedAreas: markedAreas,
+      notes: notes
+    };
+
+    if (isNew) {
+      addDemandRecord(recordData);
+    } else if (existingRecord) {
+      updateDemandRecord(existingRecord.id, recordData);
+    }
+
     Taro.showToast({
       title: '保存成功',
       icon: 'success'
@@ -53,10 +119,18 @@ const DemandDetailPage: React.FC = () => {
   };
 
   const handleGeneratePlan = () => {
-    Taro.showToast({
-      title: '已发送给医生',
-      icon: 'success'
-    });
+    if (!validateForm()) return;
+
+    handleSave();
+    
+    setTimeout(() => {
+      Taro.showModal({
+        title: '已发送给医生',
+        content: `已将 ${customer.name} 的诉求记录发送给医生面诊，确认后将生成治疗方案`,
+        showCancel: false,
+        confirmText: '好的'
+      });
+    }, 1500);
   };
 
   return (
@@ -78,12 +152,16 @@ const DemandDetailPage: React.FC = () => {
         </View>
 
         <View className={styles.section}>
-          <SectionTitle title="面部示意图" subTitle="用不同颜色圈出客户关注区域" />
+          <SectionTitle title="面部示意图" subTitle={isNew ? '点击图上位置添加标注' : '客户关注区域'} />
           <View className={styles.card}>
             <View className={styles.faceMapContainer}>
               <FaceMap
-                markedAreas={existingRecord?.markedAreas || []}
+                markedAreas={markedAreas}
                 showLabels={true}
+                interactive={isNew}
+                currentColor={selectedColor}
+                onAddMark={handleAddMark}
+                onRemoveMark={handleRemoveMark}
               />
             </View>
             
@@ -101,6 +179,12 @@ const DemandDetailPage: React.FC = () => {
                 />
               ))}
             </View>
+            
+            {isNew && (
+              <Text className={styles.tipText}>
+                💡 提示：先选择颜色和改善部位，再点击面部示意图添加标注
+              </Text>
+            )}
           </View>
         </View>
 

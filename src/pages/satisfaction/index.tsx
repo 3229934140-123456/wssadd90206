@@ -1,29 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { mockSatisfactionRecords, mockCustomers, mockFollowupRecords } from '@/data/mockData';
+import Taro, { useDidShow } from '@tarojs/taro';
+import { useAppStore } from '@/store';
 import SectionTitle from '@/components/SectionTitle';
 import StatCard from '@/components/StatCard';
 import styles from './index.module.scss';
 
 const SatisfactionPage: React.FC = () => {
-  const avgOverall = (
-    mockSatisfactionRecords.reduce((sum, r) => sum + r.overallRating, 0) / mockSatisfactionRecords.length
-  ).toFixed(1);
+  const { customers, satisfactionRecords, followupRecords } = useAppStore();
+  const [, setRefreshKey] = useState(0);
 
-  const avgEffect = (
-    mockSatisfactionRecords.reduce((sum, r) => sum + r.effectRating, 0) / mockSatisfactionRecords.length
-  ).toFixed(1);
+  useDidShow(() => {
+    setRefreshKey(prev => prev + 1);
+  });
 
-  const avgService = (
-    mockSatisfactionRecords.reduce((sum, r) => sum + r.serviceRating, 0) / mockSatisfactionRecords.length
-  ).toFixed(1);
+  const avgOverall = satisfactionRecords.length > 0 ? (
+    satisfactionRecords.reduce((sum, r) => sum + r.overallRating, 0) / satisfactionRecords.length
+  ).toFixed(1) : '0.0';
+
+  const avgEffect = satisfactionRecords.length > 0 ? (
+    satisfactionRecords.reduce((sum, r) => sum + r.effectRating, 0) / satisfactionRecords.length
+  ).toFixed(1) : '0.0';
+
+  const avgService = satisfactionRecords.length > 0 ? (
+    satisfactionRecords.reduce((sum, r) => sum + r.serviceRating, 0) / satisfactionRecords.length
+  ).toFixed(1) : '0.0';
 
   const renderStars = (count: number) => {
     return '⭐'.repeat(count) + '☆'.repeat(5 - count);
   };
 
-  const pendingReviews = mockFollowupRecords
+  const pendingReviews = followupRecords
     .filter(f => f.status === '已完成' && f.stage === 'day14')
     .slice(0, 3);
 
@@ -35,7 +42,7 @@ const SatisfactionPage: React.FC = () => {
   };
 
   const stats = [
-    { value: mockSatisfactionRecords.length, label: '评价总数', icon: '📝', color: 'warning' as const },
+    { value: satisfactionRecords.length, label: '评价总数', icon: '📝', color: 'warning' as const },
     { value: avgOverall, label: '平均分', icon: '⭐', color: 'primary' as const },
     { value: '92%', label: '好评率', icon: '😊', color: 'success' as const }
   ];
@@ -86,7 +93,7 @@ const SatisfactionPage: React.FC = () => {
             <SectionTitle title="待邀请评价" subTitle="术后14天可邀请客户评价" />
             <View className={styles.pendingList}>
               {pendingReviews.map(record => {
-                const customer = mockCustomers.find(c => c.id === record.customerId);
+                const customer = customers.find(c => c.id === record.customerId);
                 return (
                   <View key={record.id} className={styles.pendingItem}>
                     <Image
@@ -112,11 +119,11 @@ const SatisfactionPage: React.FC = () => {
         )}
 
         <View className={styles.section}>
-          <SectionTitle title="最新评价" extra={`共 ${mockSatisfactionRecords.length} 条`} />
+          <SectionTitle title="最新评价" extra={`共 ${satisfactionRecords.length} 条`} />
           
-          {mockSatisfactionRecords.length > 0 ? (
-            mockSatisfactionRecords.map(record => {
-              const customer = mockCustomers.find(c => c.id === record.customerId);
+          {satisfactionRecords.length > 0 ? (
+            satisfactionRecords.map(record => {
+              const customer = customers.find(c => c.id === record.customerId);
               return (
                 <View key={record.id} className={styles.reviewCard}>
                   <View className={styles.reviewHeader}>

@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
-import { mockTreatmentPlans, mockCustomers } from '@/data/mockData';
+import { useAppStore } from '@/store';
 import SectionTitle from '@/components/SectionTitle';
 import StatCard from '@/components/StatCard';
 import styles from './index.module.scss';
 
 const PlanPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('全部');
+  const [, setRefreshKey] = useState(0);
   const tabs = ['全部', '待确认', '已确认'];
 
-  const pendingPlans = mockTreatmentPlans.filter(p => p.status === '待确认');
-  const confirmedPlans = mockTreatmentPlans.filter(p => p.status === '已确认');
+  const { customers, treatmentPlans } = useAppStore();
 
-  const filteredPlans = mockTreatmentPlans.filter(plan => {
+  useDidShow(() => {
+    setRefreshKey(prev => prev + 1);
+  });
+
+  const pendingPlans = treatmentPlans.filter(p => p.status === '待确认');
+  const confirmedPlans = treatmentPlans.filter(p => p.status === '已确认');
+
+  const filteredPlans = treatmentPlans.filter(plan => {
     if (activeTab === '全部') return true;
     return plan.status === activeTab;
   });
@@ -35,7 +42,7 @@ const PlanPage: React.FC = () => {
   };
 
   const stats = [
-    { value: mockTreatmentPlans.length, label: '方案总数', icon: '📋', color: 'primary' as const },
+    { value: treatmentPlans.length, label: '方案总数', icon: '📋', color: 'primary' as const },
     { value: pendingPlans.length, label: '待确认', icon: '⏳', color: 'warning' as const },
     { value: confirmedPlans.length, label: '已确认', icon: '✅', color: 'success' as const }
   ];
@@ -65,7 +72,7 @@ const PlanPage: React.FC = () => {
           
           {pendingPlans.length > 0 ? (
             pendingPlans.map(plan => {
-              const customer = mockCustomers.find(c => c.id === plan.customerId);
+              const customer = customers.find(c => c.id === plan.customerId);
               return (
                 <View
                   key={plan.id}
@@ -157,7 +164,7 @@ const PlanPage: React.FC = () => {
         </View>
 
         <View className={styles.section}>
-          <SectionTitle title="全部方案" extra={`共 ${mockTreatmentPlans.length} 份`} />
+          <SectionTitle title="全部方案" extra={`共 ${treatmentPlans.length} 份`} />
           
           <View className={styles.tabRow}>
             {tabs.map(tab => (
@@ -173,7 +180,7 @@ const PlanPage: React.FC = () => {
 
           {filteredPlans.length > 0 ? (
             filteredPlans.map(plan => {
-              const customer = mockCustomers.find(c => c.id === plan.customerId);
+              const customer = customers.find(c => c.id === plan.customerId);
               return (
                 <View
                   key={plan.id}

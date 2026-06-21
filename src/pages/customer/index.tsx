@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, Input } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
-import { mockCustomers } from '@/data/mockData';
-import { Customer } from '@/types';
+import { useAppStore } from '@/store';
 import CustomerCard from '@/components/CustomerCard';
 import StatCard from '@/components/StatCard';
 import SectionTitle from '@/components/SectionTitle';
@@ -13,30 +12,114 @@ const CustomerPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('全部');
   const [searchText, setSearchText] = useState('');
 
+  const { customers, addCustomer } = useAppStore();
+
+  useDidShow(() => {
+    setActiveTab('全部');
+    setSearchText('');
+  });
+
   const tabs = ['全部', '待咨询', '咨询中', '待确认', '恢复中', '已完成'];
 
-  const todayReminders = mockCustomers.filter(c => c.status === '恢复中' || c.status === '待确认');
-  const newCustomers = mockCustomers.filter(c => c.level === '新客');
+  const todayReminders = customers.filter(c => c.status === '恢复中' || c.status === '待确认');
+  const newCustomers = customers.filter(c => c.level === '新客');
 
-  const filteredCustomers = mockCustomers.filter(customer => {
+  const filteredCustomers = customers.filter(customer => {
     const matchTab = activeTab === '全部' || customer.status === activeTab;
     const matchSearch = customer.name.includes(searchText) || customer.phone.includes(searchText);
     return matchTab && matchSearch;
   });
 
   const handleImport = () => {
-    Taro.showToast({ title: '导入预约客户功能', icon: 'none' });
+    Taro.showActionSheet({
+      itemList: ['从系统预约导入', '从Excel导入', '手动录入预约'],
+      success: (res) => {
+        if (res.tapIndex === 0 || res.tapIndex === 1) {
+          (Taro.showModal as any)({
+            title: '导入预约客户',
+            editable: true,
+            placeholderText: '请输入客户姓名',
+            success: (modalRes: any) => {
+              if (modalRes.confirm && modalRes.content) {
+                const name = modalRes.content.trim();
+                if (name) {
+                  const phone = `138****${Math.floor(1000 + Math.random() * 9000)}`;
+                  addCustomer({
+                    name,
+                    phone,
+                    age: 25 + Math.floor(Math.random() * 20),
+                    avatar: `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/200/200`,
+                    level: '新客',
+                    tags: ['预约客户'],
+                    concernAreas: [],
+                    nextAppointment: new Date(Date.now() + 86400000).toISOString().split('T')[0]
+                  });
+                  Taro.showToast({ title: '导入成功', icon: 'success' });
+                }
+              }
+            }
+          });
+        } else if (res.tapIndex === 2) {
+          handleAddCustomer();
+        }
+      }
+    });
   };
 
-  const handleAddCustomer = () => {
-    Taro.showToast({ title: '新增客户功能', icon: 'none' });
-  };
+  const handleAddCustomer = useCallback(() => {
+    (Taro.showModal as any)({
+      title: '新增客户',
+      editable: true,
+      placeholderText: '请输入客户姓名',
+      success: (nameRes: any) => {
+        if (nameRes.confirm && nameRes.content) {
+          const name = nameRes.content.trim();
+          if (!name) return;
+          
+          (Taro.showModal as any)({
+            title: '客户手机号',
+            editable: true,
+            placeholderText: '请输入客户手机号',
+            success: (phoneRes: any) => {
+              if (phoneRes.confirm && phoneRes.content) {
+                const phone = phoneRes.content.trim();
+                if (!/^1\d{10}$/.test(phone) && !/^1\d{4}\*\*\*\*\d{4}$/.test(phone)) {
+                  Taro.showToast({ title: '请输入有效手机号', icon: 'none' });
+                  return;
+                }
+
+                Taro.showActionSheet({
+                  itemList: ['新客', '普通', 'VIP'],
+                  success: (levelRes) => {
+                    const levels: Array<'新客' | '普通' | 'VIP'> = ['新客', '普通', 'VIP'];
+                    const level = levels[levelRes.tapIndex];
+                    
+                    addCustomer({
+                      name,
+                      phone,
+                      age: 25 + Math.floor(Math.random() * 20),
+                      avatar: `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/200/200`,
+                      level,
+                      tags: [],
+                      concernAreas: []
+                    });
+                    
+                    Taro.showToast({ title: '添加成功', icon: 'success' });
+                  }
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  }, [addCustomer]);
 
   const stats = [
-    { value: mockCustomers.length, label: '总客户', icon: '👥', color: 'primary' as const },
+    { value: customers.length, label: '总客户', icon: '👥', color: 'primary' as const },
     { value: todayReminders.length, label: '今日跟进', icon: '📋', color: 'warning' as const },
     { value: newCustomers.length, label: '新客', icon: '✨', color: 'success' as const },
-    { value: mockCustomers.filter(c => c.level === 'VIP').length, label: 'VIP', icon: '👑', color: 'secondary' as const }
+    { value: customers.filter(c => c.level === 'VIP').length, label: 'VIP', icon: '👑', color: 'secondary' as const }
   ];
 
   return (

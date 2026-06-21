@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { mockDemandRecords, concernTags, worryTags, mockCustomers } from '@/data/mockData';
+import Taro, { useDidShow } from '@tarojs/taro';
+import { concernTags, worryTags } from '@/data/mockData';
+import { useAppStore } from '@/store';
 import SectionTitle from '@/components/SectionTitle';
 import StatCard from '@/components/StatCard';
 import styles from './index.module.scss';
 
 const DemandPage: React.FC = () => {
+  const { customers, demandRecords } = useAppStore();
+  const [, setRefreshKey] = useState(0);
+
+  useDidShow(() => {
+    setRefreshKey(prev => prev + 1);
+  });
+
   const topConcerns = concernTags.slice(0, 6).map(tag => ({
     ...tag,
     count: Math.floor(Math.random() * 20) + 5
@@ -18,10 +26,16 @@ const DemandPage: React.FC = () => {
   }));
 
   const handleNewRecord = () => {
+    const selectableCustomers = customers.filter(c => c.status === '待咨询' || c.status === '咨询中');
+    if (selectableCustomers.length === 0) {
+      Taro.showToast({ title: '暂无可选客户', icon: 'none' });
+      return;
+    }
+    
     Taro.showActionSheet({
-      itemList: mockCustomers.slice(0, 5).map(c => c.name),
+      itemList: selectableCustomers.slice(0, 5).map(c => `${c.name} · ${c.phone.slice(-4)}`),
       success: (res) => {
-        const customer = mockCustomers[res.tapIndex];
+        const customer = selectableCustomers[res.tapIndex];
         Taro.navigateTo({
           url: `/pages/demand-detail/index?customerId=${customer.id}`
         });
@@ -36,9 +50,9 @@ const DemandPage: React.FC = () => {
   };
 
   const stats = [
-    { value: mockDemandRecords.length, label: '本周记录', icon: '📝', color: 'secondary' as const },
-    { value: '12', label: '热门诉求', icon: '🔥', color: 'warning' as const },
-    { value: '8', label: '待跟进', icon: '⏳', color: 'primary' as const }
+    { value: demandRecords.length, label: '本周记录', icon: '📝', color: 'secondary' as const },
+    { value: concernTags.length, label: '热门诉求', icon: '🔥', color: 'warning' as const },
+    { value: customers.filter(c => c.status === '咨询中').length, label: '待跟进', icon: '⏳', color: 'primary' as const }
   ];
 
   return (
@@ -108,10 +122,10 @@ const DemandPage: React.FC = () => {
         <View className={styles.section}>
           <SectionTitle title="最近记录" extra="查看全部" />
           
-          {mockDemandRecords.length > 0 ? (
+          {demandRecords.length > 0 ? (
             <View className={styles.card}>
-              {mockDemandRecords.map((record) => {
-                const customer = mockCustomers.find(c => c.id === record.customerId);
+              {demandRecords.map((record) => {
+                const customer = customers.find(c => c.id === record.customerId);
                 return (
                   <View
                     key={record.id}

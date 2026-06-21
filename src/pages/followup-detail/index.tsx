@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, Image, Textarea } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
-import { mockFollowupRecords, mockCustomers, followupScripts, discomfortTags } from '@/data/mockData';
+import { followupScripts, discomfortTags } from '@/data/mockData';
+import { useAppStore } from '@/store';
 import TagSelector from '@/components/TagSelector';
 import SectionTitle from '@/components/SectionTitle';
 import styles from './index.module.scss';
@@ -12,8 +13,17 @@ const FollowupDetailPage: React.FC = () => {
   const recordId = router.params.id || 'f001';
   const customerId = router.params.customerId;
 
-  const record = mockFollowupRecords.find(f => f.id === recordId) || mockFollowupRecords[0];
-  const customer = mockCustomers.find(c => c.id === (customerId || record.customerId)) || mockCustomers[0];
+  const { customers, followupRecords, updateFollowupRecord, addPhotoToFollowup, completeFollowup } = useAppStore();
+
+  const record = useMemo(() => 
+    followupRecords.find(f => f.id === recordId) || followupRecords[0],
+    [followupRecords, recordId]
+  );
+  
+  const customer = useMemo(() => 
+    customers.find(c => c.id === (customerId || record.customerId)) || customers[0],
+    [customers, customerId, record]
+  );
 
   const [feedback, setFeedback] = useState(record.feedback);
   const [selectedDiscomfort, setSelectedDiscomfort] = useState<string[]>(record.discomfortTags);
@@ -36,7 +46,16 @@ const FollowupDetailPage: React.FC = () => {
   const handleUploadPhoto = () => {
     Taro.chooseImage({
       count: 9 - record.photos.length,
-      success: () => {
+      success: (res) => {
+        const tempFiles = res.tempFiles || [];
+        tempFiles.forEach(file => {
+          addPhotoToFollowup(record.id, file.path || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/400/400`);
+        });
+        Taro.showToast({ title: '上传成功', icon: 'success' });
+      },
+      fail: () => {
+        const mockPhoto = `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/400/400`;
+        addPhotoToFollowup(record.id, mockPhoto);
         Taro.showToast({ title: '上传成功', icon: 'success' });
       }
     });
@@ -60,6 +79,7 @@ const FollowupDetailPage: React.FC = () => {
       content: '确认将该客户的不适反馈转给医生复核吗？',
       success: (res) => {
         if (res.confirm) {
+          updateFollowupRecord(record.id, { needDoctorReview: true });
           Taro.showToast({ title: '已转给医生', icon: 'success' });
         }
       }
@@ -67,12 +87,32 @@ const FollowupDetailPage: React.FC = () => {
   };
 
   const handleSave = () => {
+    updateFollowupRecord(record.id, {
+      feedback,
+      discomfortTags: selectedDiscomfort,
+      rebookIntent: rebookIntent as any,
+      status: '进行中'
+    });
     Taro.showToast({ title: '保存成功', icon: 'success' });
   };
 
   const handleComplete = () => {
-    Taro.showToast({ title: '回访完成', icon: 'success' });
-    setTimeout(() => Taro.navigateBack(), 1500);
+    Taro.showModal({
+      title: '完成回访',
+      content: '确认完成本次回访吗？',
+      success: (res) => {
+        if (res.confirm) {
+          updateFollowupRecord(record.id, {
+            feedback,
+            discomfortTags: selectedDiscomfort,
+            rebookIntent: rebookIntent as any
+          });
+          completeFollowup(record.id);
+          Taro.showToast({ title: '回访完成', icon: 'success' });
+          setTimeout(() => Taro.navigateBack(), 1500);
+        }
+      }
+    });
   };
 
   const currentScript = followupScripts.find(s => s.stage === record.stage);

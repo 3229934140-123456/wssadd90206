@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, Image } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
-import { mockTreatmentPlans, mockCustomers, contraindicationTags } from '@/data/mockData';
+import { contraindicationTags } from '@/data/mockData';
+import { useAppStore } from '@/store';
 import FaceMap from '@/components/FaceMap';
 import SectionTitle from '@/components/SectionTitle';
 import styles from './index.module.scss';
@@ -12,8 +13,17 @@ const PlanDetailPage: React.FC = () => {
   const planId = router.params.id || 'p001';
   const customerId = router.params.customerId;
 
-  const plan = mockTreatmentPlans.find(p => p.id === planId) || mockTreatmentPlans[0];
-  const customer = mockCustomers.find(c => c.id === (customerId || plan.customerId)) || mockCustomers[0];
+  const { customers, treatmentPlans, confirmTreatmentPlan, updateTreatmentPlan } = useAppStore();
+
+  const plan = useMemo(() => 
+    treatmentPlans.find(p => p.id === planId) || treatmentPlans[0],
+    [treatmentPlans, planId]
+  );
+  
+  const customer = useMemo(() => 
+    customers.find(c => c.id === (customerId || plan.customerId)) || customers[0],
+    [customers, customerId, plan]
+  );
 
   const [checkedContra, setCheckedContra] = useState<string[]>(plan.contraindications);
 
@@ -21,6 +31,7 @@ const PlanDetailPage: React.FC = () => {
     setCheckedContra(prev =>
       prev.includes(label) ? prev.filter(c => c !== label) : [...prev, label]
     );
+    updateTreatmentPlan(plan.id, { contraindications: checkedContra });
   };
 
   const handleConfirm = () => {
@@ -31,6 +42,7 @@ const PlanDetailPage: React.FC = () => {
       cancelText: '稍后确认',
       success: (res) => {
         if (res.confirm) {
+          confirmTreatmentPlan(plan.id);
           Taro.showToast({
             title: '确认成功',
             icon: 'success'
@@ -41,9 +53,20 @@ const PlanDetailPage: React.FC = () => {
   };
 
   const handleStartTreatment = () => {
-    Taro.showToast({
-      title: '开始治疗流程',
-      icon: 'success'
+    Taro.showModal({
+      title: '开始治疗',
+      content: '确认开始治疗吗？治疗完成后将进入术后回访阶段',
+      success: (res) => {
+        if (res.confirm) {
+          Taro.showToast({
+            title: '开始治疗流程',
+            icon: 'success'
+          });
+          setTimeout(() => {
+            Taro.navigateBack();
+          }, 1500);
+        }
+      }
     });
   };
 
@@ -110,7 +133,7 @@ const PlanDetailPage: React.FC = () => {
           <SectionTitle title="点位明细" subTitle="医生制定，不可修改剂量" />
           <View className={styles.card}>
             <View className={styles.pointsList}>
-              {plan.injectionPoints.map((point, index) => (
+              {plan.injectionPoints.map((point) => (
                 <View key={point.id} className={styles.pointItem}>
                   <View className={styles.pointIcon} />
                   <View className={styles.pointInfo}>

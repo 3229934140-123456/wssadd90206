@@ -189,3 +189,12 @@
   font-weight: $font-weight-semibold;
   color: $color-primary;
 }
+
+.tipText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+  line-height: $line-height-normal;
+}

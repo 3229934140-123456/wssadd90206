@@ -1,19 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
-import { mockCustomers, mockDemandRecords, mockTreatmentPlans, mockFollowupRecords } from '@/data/mockData';
+import { useAppStore } from '@/store';
 import SectionTitle from '@/components/SectionTitle';
 import styles from './index.module.scss';
 
 const CustomerDetailPage: React.FC = () => {
   const router = useRouter();
   const customerId = router.params.id || 'c001';
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const { customers, demandRecords, treatmentPlans, followupRecords } = useAppStore();
+
+  useDidShow(() => {
+    setRefreshKey(prev => prev + 1);
+  });
+
+  const customer = useMemo(() => 
+    customers.find(c => c.id === customerId) || customers[0],
+    [customers, customerId, refreshKey]
+  );
   
-  const customer = mockCustomers.find(c => c.id === customerId) || mockCustomers[0];
-  const demandRecords = mockDemandRecords.filter(d => d.customerId === customerId);
-  const treatmentPlans = mockTreatmentPlans.filter(p => p.customerId === customerId);
-  const followupRecords = mockFollowupRecords.filter(f => f.customerId === customerId);
+  const customerDemandRecords = useMemo(() => 
+    demandRecords.filter(d => d.customerId === customerId),
+    [demandRecords, customerId, refreshKey]
+  );
+  
+  const customerTreatmentPlans = useMemo(() => 
+    treatmentPlans.filter(p => p.customerId === customerId),
+    [treatmentPlans, customerId, refreshKey]
+  );
+  
+  const customerFollowupRecords = useMemo(() => 
+    followupRecords.filter(f => f.customerId === customerId),
+    [followupRecords, customerId, refreshKey]
+  );
 
   const steps = [
     { label: '诉求记录', status: 'done' },
@@ -24,15 +46,33 @@ const CustomerDetailPage: React.FC = () => {
   ];
 
   const quickActions = [
-    { icon: '📝', label: '诉求记录', url: `/pages/demand-detail/index?customerId=${customerId}` },
-    { icon: '📋', label: '方案确认', url: `/pages/plan-detail/index?customerId=${customerId}` },
-    { icon: '📸', label: '术后回访', url: `/pages/followup-detail/index?customerId=${customerId}` },
-    { icon: '⭐', label: '满意度', url: '' }
+    { icon: '📝', label: '诉求记录', action: 'demand' },
+    { icon: '📋', label: '方案确认', action: 'plan' },
+    { icon: '📸', label: '术后回访', action: 'followup' },
+    { icon: '⭐', label: '满意度', action: 'satisfaction' }
   ];
 
-  const handleAction = (url: string, label: string) => {
-    if (url) {
+  const handleAction = (action: string, label: string) => {
+    if (action === 'demand') {
+      const hasDemand = customerDemandRecords.length > 0;
+      const url = hasDemand 
+        ? `/pages/demand-detail/index?id=${customerDemandRecords[0].id}`
+        : `/pages/demand-detail/index?customerId=${customerId}`;
       Taro.navigateTo({ url });
+    } else if (action === 'plan') {
+      if (customerTreatmentPlans.length > 0) {
+        Taro.navigateTo({ url: `/pages/plan-detail/index?id=${customerTreatmentPlans[0].id}` });
+      } else {
+        Taro.showToast({ title: '暂无治疗方案', icon: 'none' });
+      }
+    } else if (action === 'followup') {
+      if (customerFollowupRecords.length > 0) {
+        const pending = customerFollowupRecords.find(f => f.status !== '已完成');
+        const target = pending || customerFollowupRecords[0];
+        Taro.navigateTo({ url: `/pages/followup-detail/index?id=${target.id}` });
+      } else {
+        Taro.showToast({ title: '暂无回访记录', icon: 'none' });
+      }
     } else {
       Taro.showToast({ title: `${label}功能`, icon: 'none' });
     }
@@ -65,7 +105,7 @@ const CustomerDetailPage: React.FC = () => {
             <View
               key={index}
               className={styles.actionItem}
-              onClick={() => handleAction(action.url, action.label)}
+              onClick={() => handleAction(action.action, action.label)}
             >
               <Text className={styles.actionIcon}>{action.icon}</Text>
               <Text className={styles.actionLabel}>{action.label}</Text>
@@ -127,11 +167,11 @@ const CustomerDetailPage: React.FC = () => {
           </View>
         </View>
 
-        {demandRecords.length > 0 && (
+        {customerDemandRecords.length > 0 && (
           <View className={styles.section}>
             <SectionTitle title="诉求记录" extra="查看全部" />
             <View className={styles.card}>
-              {demandRecords.map(record => (
+              {customerDemandRecords.map(record => (
                 <View
                   key={record.id}
                   className={styles.recordItem}
@@ -153,11 +193,11 @@ const CustomerDetailPage: React.FC = () => {
           </View>
         )}
 
-        {treatmentPlans.length > 0 && (
+        {customerTreatmentPlans.length > 0 && (
           <View className={styles.section}>
             <SectionTitle title="治疗方案" extra="查看全部" />
             <View className={styles.card}>
-              {treatmentPlans.map(plan => (
+              {customerTreatmentPlans.map(plan => (
                 <View
                   key={plan.id}
                   className={styles.recordItem}
@@ -176,11 +216,11 @@ const CustomerDetailPage: React.FC = () => {
           </View>
         )}
 
-        {followupRecords.length > 0 && (
+        {customerFollowupRecords.length > 0 && (
           <View className={styles.section}>
             <SectionTitle title="回访记录" extra="查看全部" />
             <View className={styles.card}>
-              {followupRecords.map(record => (
+              {customerFollowupRecords.map(record => (
                 <View
                   key={record.id}
                   className={styles.recordItem}

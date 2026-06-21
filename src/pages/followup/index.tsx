@@ -1,21 +1,29 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
-import { mockFollowupRecords, mockCustomers, followupScripts } from '@/data/mockData';
+import { followupScripts } from '@/data/mockData';
+import { useAppStore } from '@/store';
 import SectionTitle from '@/components/SectionTitle';
 import StatCard from '@/components/StatCard';
 import styles from './index.module.scss';
 
 const FollowupPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('全部');
+  const [, setRefreshKey] = useState(0);
   const tabs = ['全部', '待回访', '进行中', '已完成'];
 
-  const pendingFollowups = mockFollowupRecords.filter(f => f.status === '待回访');
-  const needReview = mockFollowupRecords.filter(f => f.needDoctorReview);
-  const completedFollowups = mockFollowupRecords.filter(f => f.status === '已完成');
+  const { customers, followupRecords } = useAppStore();
 
-  const filteredRecords = mockFollowupRecords.filter(record => {
+  useDidShow(() => {
+    setRefreshKey(prev => prev + 1);
+  });
+
+  const pendingFollowups = followupRecords.filter(f => f.status === '待回访');
+  const needReview = followupRecords.filter(f => f.needDoctorReview);
+  const completedFollowups = followupRecords.filter(f => f.status === '已完成');
+
+  const filteredRecords = followupRecords.filter(record => {
     if (activeTab === '全部') return true;
     return record.status === activeTab;
   });
@@ -45,7 +53,7 @@ const FollowupPage: React.FC = () => {
   };
 
   const stats = [
-    { value: mockFollowupRecords.length, label: '回访总数', icon: '📊', color: 'success' as const },
+    { value: followupRecords.length, label: '回访总数', icon: '📊', color: 'success' as const },
     { value: pendingFollowups.length, label: '待回访', icon: '⏰', color: 'warning' as const },
     { value: needReview.length, label: '需复核', icon: '⚠️', color: 'error' as const },
     { value: completedFollowups.length, label: '已完成', icon: '✅', color: 'success' as const }
@@ -75,7 +83,7 @@ const FollowupPage: React.FC = () => {
           <View className={styles.section}>
             <SectionTitle title="需医生复核" subTitle="客户有不适反馈，请及时处理" />
             {needReview.map(record => {
-              const customer = mockCustomers.find(c => c.id === record.customerId);
+              const customer = customers.find(c => c.id === record.customerId);
               return (
                 <View
                   key={record.id}
@@ -151,7 +159,7 @@ const FollowupPage: React.FC = () => {
 
           {filteredRecords.length > 0 ? (
             filteredRecords.map(record => {
-              const customer = mockCustomers.find(c => c.id === record.customerId);
+              const customer = customers.find(c => c.id === record.customerId);
               return (
                 <View
                   key={record.id}
